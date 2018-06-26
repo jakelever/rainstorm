@@ -68,7 +68,7 @@ if __name__ == '__main__':
 			print("Taking the day off...")
 			sys.exit(0)
 
-	potentialTweets = decryptFile(key,'tweets')
+	potentialTweets = decryptFile(key,'lines')
 	potentialTweets = [ t.strip() for t in potentialTweets ]
 	potentialTweets = [ t for t in potentialTweets if not t in recentTweets ]
 
