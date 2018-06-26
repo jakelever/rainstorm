@@ -70,7 +70,7 @@ if __name__ == '__main__':
 
 	potentialTweets = decryptFile(key,'lines')
 	potentialTweets = [ t.strip() for t in potentialTweets ]
-	potentialTweets = [ t for t in potentialTweets if not t in recentTweets ]
+	potentialTweets = [ t for t in potentialTweets if t and not t in recentTweets ]
 
 	assert len(potentialTweets) > 0
 
