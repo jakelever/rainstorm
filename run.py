@@ -54,7 +54,8 @@ if __name__ == '__main__':
 	api = twitter.Api(consumer_key=consumer_key,
 			consumer_secret=consumer_secret,
 			access_token_key=access_token,
-			access_token_secret=access_token_secret)
+			access_token_secret=access_token_secret,
+			tweet_mode='extended')
 
 	statuses = api.GetUserTimeline(screen_name=account,count=200)
 	recentTweets = [ status.text.strip() for status in statuses ]
