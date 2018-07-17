@@ -32,6 +32,26 @@ def decryptFile(key,filename):
 	decrypted = str(decrypt(key,encrypted),'utf-8')
 	return decrypted.split('\n')
 
+def getTweets(screen_name):
+	all_statuses = []
+	max_id = None
+	while True:
+		if max_id is None:
+			statuses = api.GetUserTimeline(screen_name=screen_name,count=200)
+		else:
+			statuses = api.GetUserTimeline(screen_name=screen_name,count=200,max_id=max_id)
+
+		all_statuses_set = set(all_statuses)
+		new_statuses = [ s for s in statuses if not s in all_statuses_set ]
+
+		if len(new_statuses) == 0:
+			break
+
+		all_statuses += new_statuses
+		max_id = all_statuses[-1].id
+
+	return all_statuses
+
 if __name__ == '__main__':
 	key = getKey()
 	if key is None:
@@ -55,9 +75,10 @@ if __name__ == '__main__':
 			consumer_secret=consumer_secret,
 			access_token_key=access_token,
 			access_token_secret=access_token_secret,
-			tweet_mode='extended')
+			tweet_mode='extended',
+			sleep_on_rate_limit=True)
 
-	statuses = api.GetUserTimeline(screen_name=account,count=200)
+	statuses = getTweets(account)
 	recentTweets = [ status.full_text.strip() for status in statuses ]
 
 	if len(statuses) > 0:
