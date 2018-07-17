@@ -58,7 +58,7 @@ if __name__ == '__main__':
 			tweet_mode='extended')
 
 	statuses = api.GetUserTimeline(screen_name=account,count=200)
-	recentTweets = [ status.text.strip() for status in statuses ]
+	recentTweets = [ status.full_text.strip() for status in statuses ]
 
 	if len(statuses) > 0:
 		twelveHours = 60*60*12
