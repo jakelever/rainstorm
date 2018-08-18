@@ -70,6 +70,7 @@ if __name__ == '__main__':
 	consumer_secret = settings[2]
 	access_token = settings[3]
 	access_token_secret = settings[4]
+	search_term = settings[5]
 
 	api = twitter.Api(consumer_key=consumer_key,
 			consumer_secret=consumer_secret,
@@ -100,5 +101,46 @@ if __name__ == '__main__':
 
 	status = api.PostUpdate(selectedTweet)
 
-	print("Job done")
+	print("Message sent")
+
+	next_cursor = -1
+	currently_following = []
+	while True:
+		next_cursor,previous_cursor,users = api.GetFriendsPaged(screen_name=account,skip_status=True,count=200,include_user_entities=False,cursor=next_cursor)
+		if len(users) == 0:
+			break
+		currently_following += [ u.screen_name for u in users ]
+	currently_following = set(currently_following)
+
+	oneWeek = 7*24*60*60
+	now = time.time()
+
+	potentials = []
+	for page in range(1,20):
+		users = api.GetUsersSearch(term=search_term,count=20,page=page)
+		if len(users) == 0:
+			break
+
+		userDicts = [ u.AsDict() for u in users ]
+		for ud in userDicts:
+			screen_name = ud['screen_name']
+
+			if not 'status' in ud:
+				continue
+			if screen_name in currently_following:
+				continue
+
+			lastTweetDate = ud['status']['created_at']
+
+			lastTweetDate_datetime = datetime.datetime.strptime(lastTweetDate, '%a %b %d %H:%M:%S %z %Y')
+			secondsSinceLastTweet = now - lastTweetDate_datetime.timestamp()
+
+			if secondsSinceLastTweet < oneWeek:
+				potentials.append(screen_name)
+
+	potentials = sorted(list(set(potentials)))
+	if len(potentials) > 0:
+		selected = random.choice(potentials)
+		api.CreateFriendship(screen_name=selected)
+		print("Found a friend")
 
