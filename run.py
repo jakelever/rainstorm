@@ -8,6 +8,7 @@ import random
 import twitter
 import time
 import datetime
+import html
 
 def getKey():
 	key = None
@@ -80,7 +81,7 @@ if __name__ == '__main__':
 			sleep_on_rate_limit=True)
 
 	statuses = getTweets(account)
-	recentTweets = [ status.full_text.strip() for status in statuses ]
+	recentTweets = [ html.unescape(status.full_text.strip()) for status in statuses ]
 
 	if len(statuses) > 0:
 		twelveHours = 60*60*12
