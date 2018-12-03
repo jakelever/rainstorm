@@ -59,8 +59,10 @@ if __name__ == '__main__':
 		print("Nothing to see here")
 		sys.exit(0)
 
-	day = datetime.datetime.today().weekday()
-	if day > 4:
+	today = datetime.date.today().strftime("%m-%d")
+	holidays = ['12-25','01-01']
+	dayofweek = datetime.datetime.today().weekday()
+	if today in holidays or dayofweek > 4:
 		print("I don't work now")
 		sys.exit(0)
 
