@@ -83,16 +83,18 @@ if __name__ == '__main__':
 			sleep_on_rate_limit=True)
 
 	statuses = getTweets(account)
-	recentTweets = [ html.unescape(status.full_text.strip()) for status in statuses ]
+	non_replies = [ s for s in statuses if s.in_reply_to_screen_name is None ]
 
-	if len(statuses) > 0:
+	if len(non_replies) > 0:
 		twelveHours = 60*60*12
-		status0 = statuses[0]
+		status0 = non_replies[0]
 		lastTweetTime =  status0.created_at_in_seconds
 		secondsSince = time.time() - lastTweetTime
 		if secondsSince < twelveHours:
 			print("Taking the day off...")
 			sys.exit(0)
+
+	recentTweets = [ html.unescape(status.full_text.strip()) for status in non_replies ]
 
 	potentialTweets = decryptFile(key,'lines')
 	potentialTweets = [ t.strip() for t in potentialTweets ]
