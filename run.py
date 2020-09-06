@@ -93,7 +93,7 @@ if __name__ == '__main__':
 		secondsSince = time.time() - lastTweetTime
 		if secondsSince < twelveHours:
 			print("Taking the day off...")
-			#sys.exit(0)
+			sys.exit(0)
 
 	recentTweets = [ html.unescape(status.full_text.strip()) for status in non_replies ]
 
