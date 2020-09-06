@@ -63,10 +63,11 @@ if __name__ == '__main__':
 	holidays = ['12-25','01-01']
 	dayofweek = datetime.datetime.today().weekday()
 	if today in holidays or dayofweek > 4:
-		print("I don't work now")
-		sys.exit(0)
+		#print("I don't work now")
+		#sys.exit(0)
+		pass
 
-	settings = decryptFile(key,'settings')
+	settings = decryptFile(key,'settings2')
 
 	account = settings[0]
 	consumer_key = settings[1]
@@ -92,11 +93,11 @@ if __name__ == '__main__':
 		secondsSince = time.time() - lastTweetTime
 		if secondsSince < twelveHours:
 			print("Taking the day off...")
-			sys.exit(0)
+			#sys.exit(0)
 
 	recentTweets = [ html.unescape(status.full_text.strip()) for status in non_replies ]
 
-	potentialTweets = decryptFile(key,'lines')
+	potentialTweets = decryptFile(key,'lines2')
 	potentialTweets = [ t.strip() for t in potentialTweets ]
 	potentialTweets = [ t for t in potentialTweets if t and len(t) < 280 and not t in recentTweets ]
 
@@ -108,44 +109,46 @@ if __name__ == '__main__':
 
 	print("Message sent")
 
-	next_cursor = -1
-	currently_following = []
-	while True:
-		next_cursor,previous_cursor,users = api.GetFriendsPaged(screen_name=account,skip_status=True,count=200,include_user_entities=False,cursor=next_cursor)
-		if len(users) == 0:
-			break
-		currently_following += [ u.screen_name for u in users ]
-	currently_following = set(currently_following)
+	if search_term:
 
-	oneWeek = 7*24*60*60
-	now = time.time()
+		next_cursor = -1
+		currently_following = []
+		while True:
+			next_cursor,previous_cursor,users = api.GetFriendsPaged(screen_name=account,skip_status=True,count=200,include_user_entities=False,cursor=next_cursor)
+			if len(users) == 0:
+				break
+			currently_following += [ u.screen_name for u in users ]
+		currently_following = set(currently_following)
 
-	potentials = []
-	for page in range(1,20):
-		users = api.GetUsersSearch(term=search_term,count=20,page=page)
-		if len(users) == 0:
-			break
+		oneWeek = 7*24*60*60
+		now = time.time()
 
-		userDicts = [ u.AsDict() for u in users ]
-		for ud in userDicts:
-			screen_name = ud['screen_name']
+		potentials = []
+		for page in range(1,20):
+			users = api.GetUsersSearch(term=search_term,count=20,page=page)
+			if len(users) == 0:
+				break
 
-			if not 'status' in ud:
-				continue
-			if screen_name in currently_following:
-				continue
+			userDicts = [ u.AsDict() for u in users ]
+			for ud in userDicts:
+				screen_name = ud['screen_name']
 
-			lastTweetDate = ud['status']['created_at']
+				if not 'status' in ud:
+					continue
+				if screen_name in currently_following:
+					continue
 
-			lastTweetDate_datetime = datetime.datetime.strptime(lastTweetDate, '%a %b %d %H:%M:%S %z %Y')
-			secondsSinceLastTweet = now - lastTweetDate_datetime.timestamp()
+				lastTweetDate = ud['status']['created_at']
 
-			if secondsSinceLastTweet < oneWeek:
-				potentials.append(screen_name)
+				lastTweetDate_datetime = datetime.datetime.strptime(lastTweetDate, '%a %b %d %H:%M:%S %z %Y')
+				secondsSinceLastTweet = now - lastTweetDate_datetime.timestamp()
 
-	potentials = sorted(list(set(potentials)))
-	if len(potentials) > 0:
-		selected = random.choice(potentials)
-		api.CreateFriendship(screen_name=selected)
-		print("Found a friend")
+				if secondsSinceLastTweet < oneWeek:
+					potentials.append(screen_name)
+
+		potentials = sorted(list(set(potentials)))
+		if len(potentials) > 0:
+			selected = random.choice(potentials)
+			api.CreateFriendship(screen_name=selected)
+			print("Found a friend")
 
