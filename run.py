@@ -102,6 +102,7 @@ if __name__ == '__main__':
 	potentialTweets = [ t for t in potentialTweets if t and len(t) < 280 and not t in recentTweets ]
 
 	assert len(potentialTweets) > 0
+	print ("%d possibilities remain" % len(potentialTweets))
 
 	selectedTweet = random.choice(potentialTweets)
 
